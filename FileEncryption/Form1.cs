@@ -27,10 +27,10 @@ namespace FileEncryption
 
         private async void btn_Encrypt_Click(object sender, EventArgs e)
         {
-            await ProcessFileAsync(isEncrypting: true);
+            await ProcessFileAsync();
         }
 
-        private async Task ProcessFileAsync(bool isEncrypting)
+        private async Task ProcessFileAsync()
         {
             string filePath = tb_FilePath.Text;
             string key = tb_Key.Text;
@@ -42,10 +42,10 @@ namespace FileEncryption
             }
 
             try
-            {;
-                await Task.Run(() => EncryptDecryptFile(filePath, key));
+            {
+                await Task.Run(() => ProcessFile(filePath, key));
 
-                MessageBox.Show($"Encryption completed successfully for:\n{filePath}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Operation completed successfully for:\n{filePath}", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
@@ -53,18 +53,15 @@ namespace FileEncryption
             }
         }
 
-        private void EncryptDecryptFile(string filePath, string key)
+        private void ProcessFile(string filePath, string key)
         {
             byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-
             string tempFile = Path.GetTempFileName();
 
             using (FileStream inputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             using (FileStream tempStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write))
             {
                 byte[] buffer = new byte[8192];
-                long totalBytes = inputStream.Length;
-                long processedBytes = 0;
                 int bytesRead;
 
                 while ((bytesRead = inputStream.Read(buffer, 0, buffer.Length)) > 0)
@@ -74,15 +71,11 @@ namespace FileEncryption
                         buffer[i] ^= keyBytes[i % keyBytes.Length];
                     }
                     tempStream.Write(buffer, 0, bytesRead);
-
-                    processedBytes += bytesRead;
-                    int progressPercentage = (int)((processedBytes * 100) / totalBytes);
                 }
             }
 
             File.Copy(tempFile, filePath, overwrite: true);
             File.Delete(tempFile);
-
         }
     }
 }
