@@ -8,7 +8,7 @@ namespace FileEncryption
 {
     public partial class Form1 : Form
     {
-        private const int BufferSize = 8192;
+        private const int Buffer = 8192;
 
         public Form1()
         {
@@ -75,7 +75,7 @@ namespace FileEncryption
 
         private void ProcessAndWriteData(FileStream inputStream, FileStream tempStream, byte[] keyBytes, long totalBytes, ref long processedBytes)
         {
-            byte[] buffer = new byte[BufferSize];
+            byte[] buffer = new byte[Buffer];
             int bytesRead;
 
             while ((bytesRead = inputStream.Read(buffer, 0, buffer.Length)) > 0)
